@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Safe Sahel — Swim Safety Predictor</title>
+<style>
+  :root{
+    --deep:#0d3b4f;
+    --mid:#136477;
+    --sea:#1c8ba0;
+    --foam:#dff2f0;
+    --sand:#f2e6c9;
+    --sun:#e8a33d;
+    --coral:#c1543d;
+    --ink:#0d2b30;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Iowan Old Style','Georgia',serif;
+    background:linear-gradient(180deg,var(--deep) 0%,var(--mid) 45%,var(--sea) 100%);
+    color:var(--foam);
+    min-height:100vh;
+    padding:32px 16px 60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  header{text-align:left;margin-bottom:28px;}
+  .kicker{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--sand);
+    margin:0 0 6px;
+  }
+  h1{
+    font-size:38px;
+    line-height:1.08;
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  h1 em{font-style:italic;color:var(--sun);}
+  .sub{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:15px;
+    color:#bfe3e0;
+    max-width:46ch;
+    line-height:1.5;
+  }
+  .card{
+    background:rgba(13,43,48,.55);
+    border:1px solid rgba(223,242,240,.18);
+    border-radius:4px;
+    padding:26px 24px;
+    margin-top:22px;
+    backdrop-filter:blur(6px);
+  }
+  .card h2{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.03em;
+    color:var(--sand);
+    margin:0 0 16px;
+    border-bottom:1px solid rgba(223,242,240,.18);
+    padding-bottom:10px;
+  }
+  .field{margin-bottom:16px;}
+  label{
+    display:flex;
+    justify-content:space-between;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13.5px;
+    color:var(--foam);
+    margin-bottom:6px;
+  }
+  label span.val{color:var(--sun);font-variant-numeric:tabular-nums;}
+  input[type=range]{
+    width:100%;
+    accent-color:var(--sun);
+    height:4px;
+  }
+  select{
+    width:100%;
+    padding:9px 10px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:14px;
+    background:rgba(223,242,240,.08);
+    color:var(--foam);
+    border:1px solid rgba(223,242,240,.25);
+    border-radius:3px;
+  }
+  select option{color:#000;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .result{
+    margin-top:22px;
+    padding:26px 24px;
+    border-radius:4px;
+    transition:background .35s ease, border-color .35s ease;
+    border:1px solid rgba(223,242,240,.18);
+  }
+  .result.safe{background:rgba(28,139,160,.35);}
+  .result.unsafe{background:rgba(193,84,61,.32);}
+  .result-top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .verdict{font-family:'Iowan Old Style',Georgia,serif;font-size:26px;font-weight:600;}
+  .verdict.safe-text{color:#a9f2df;}
+  .verdict.unsafe-text{color:#ffcfc0;}
+  .pct{font-size:34px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .bar-track{
+    margin-top:14px;height:8px;border-radius:5px;
+    background:rgba(223,242,240,.15);overflow:hidden;
+  }
+  .bar-fill{height:100%;transition:width .35s ease, background .35s ease;}
+  .note{
+    margin-top:12px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;
+    color:#dcf0ee;
+    line-height:1.5;
+  }
+  footer{
+    margin-top:30px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11.5px;
+    color:#8fc2c7;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Egypt North Coast · Jul – Sep</p>
+    <h1>Safe <em>Sahel</em></h1>
+    <p class="sub">A small logistic-regression model, trained on simulated summer sea conditions, estimates whether this week is safe to swim.</p>
+  </header>
+
+  <div class="card">
+    <h2>THIS WEEK'S CONDITIONS</h2>
+
+    <div class="field">
+      <label>Sea temperature <span class="val" id="v_temp">27.5°C</span></label>
+      <input type="range" id="temp" min="18" max="34" step="0.5" value="27.5">
+    </div>
+
+    <div class="field">
+      <label>Wave height <span class="val" id="v_wave">0.6 m</span></label>
+      <input type="range" id="wave" min="0" max="3" step="0.1" value="0.6">
+    </div>
+
+    <div class="field">
+      <label>Wind speed <span class="val" id="v_wind">18 km/h</span></label>
+      <input type="range" id="wind" min="0" max="70" step="1" value="18">
+    </div>
+
+    <div class="field">
+      <label>Current strength <span class="val" id="v_current">3 / 10</span></label>
+      <input type="range" id="current" min="0" max="10" step="0.5" value="3">
+    </div>
+
+    <div class="field">
+      <label>UV index <span class="val" id="v_uv">9</span></label>
+      <input type="range" id="uv" min="0" max="12" step="0.5" value="9">
+    </div>
+
+    <div class="field">
+      <label>Incidents reported this week <span class="val" id="v_inc">0</span></label>
+      <input type="range" id="incidents" min="0" max="8" step="1" value="0">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Weather</label>
+        <select id="weather">
+          <option>Clear</option>
+          <option>Partly Cloudy</option>
+          <option>Windy</option>
+          <option>Stormy</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Beach crowd</label>
+        <select id="crowd">
+          <option>Low</option>
+          <option selected>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="result safe" id="result">
+    <div class="result-top">
+      <span class="verdict safe-text" id="verdict">SAFE</span>
+      <span class="pct" id="pct">--%</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar" style="width:0%;background:#3fd9b6;"></div></div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <footer>
+    Model: logistic regression trained on a simulated dataset built from typical Mediterranean summer ranges for Egypt's North Coast. For guidance only — always follow posted lifeguard flags.
+  </footer>
+</div>
+
+<script>
+// ---- Real weights exported from the trained scikit-learn model ----
+const W = {
+  numeric_features: ["sea_temp_c","wave_height_m","wind_speed_kmh","current_strength","uv_index","historical_incidents","sea_roughness_score","recent_incident_flag"],
+  means: [26.831944444444442,0.6756944444444444,20.432407407407407,3.888425925925926,9.00601851851852,1.5185185185185186,7.283055555555556,0.6574074074074074],
+  stds: [1.4713145787037432,0.4613983166807205,8.833268644456044,1.7813346338760623,1.4787416070422192,1.5839559096550442,2.937750921775885,0.4745765566199815],
+  cat_features: ["weather_condition_Clear","weather_condition_Partly Cloudy","weather_condition_Stormy","weather_condition_Windy","crowd_level_High","crowd_level_Low","crowd_level_Medium"],
+  coef: [-0.28135371113161756,-0.49802209986104473,-0.7303080879004905,0.10238872190395387,-0.13057867867054854,-3.1868697832387984,-0.3139426447537059,0.3589536167181485,0.4898090642928845,0.6369601759535484,-0.7142826907027471,-0.43255098853444207,0.4917636586243391,-0.03774988006460236,-0.47407821755049323],
+  intercept: -0.022107227020143918
+};
+
+function sigmoid(z){ return 1/(1+Math.exp(-z)); }
+
+function predict(){
+  const temp = parseFloat(temp_el.value);
+  const wave = parseFloat(wave_el.value);
+  const wind = parseFloat(wind_el.value);
+  const current = parseFloat(current_el.value);
+  const uv = parseFloat(uv_el.value);
+  const inc = parseFloat(incidents_el.value);
+  const weather = weather_el.value;
+  const crowd = crowd_el.value;
+
+  const roughness = wave*2 + wind/10 + current;
+  const recentFlag = inc > 0 ? 1 : 0;
+
+  const rawNumeric = [temp, wave, wind, current, uv, inc, roughness, recentFlag];
+  let z = W.intercept;
+
+  // numeric: standardize then multiply by coefficient
+  rawNumeric.forEach((val, i) => {
+    const scaled = (val - W.means[i]) / W.stds[i];
+    z += scaled * W.coef[i];
+  });
+
+  // categorical: one-hot, coefficients come right after the numeric ones
+  const catValues = {
+    "weather_condition_Clear": weather === "Clear" ? 1 : 0,
+    "weather_condition_Partly Cloudy": weather === "Partly Cloudy" ? 1 : 0,
+    "weather_condition_Stormy": weather === "Stormy" ? 1 : 0,
+    "weather_condition_Windy": weather === "Windy" ? 1 : 0,
+    "crowd_level_High": crowd === "High" ? 1 : 0,
+    "crowd_level_Low": crowd === "Low" ? 1 : 0,
+    "crowd_level_Medium": crowd === "Medium" ? 1 : 0,
+  };
+  W.cat_features.forEach((name, i) => {
+    z += catValues[name] * W.coef[W.numeric_features.length + i];
+  });
+
+  const probSafe = sigmoid(z);
+  render(probSafe);
+}
+
+function render(p){
+  const pct = Math.round(p*100);
+  pct_el.textContent = pct + "%";
+  bar_el.style.width = pct + "%";
+
+  if (p >= 0.5){
+    result_el.className = "result safe";
+    verdict_el.className = "verdict safe-text";
+    verdict_el.textContent = "SAFE";
+    bar_el.style.background = "#3fd9b6";
+    note_el.textContent = "Conditions look manageable — still check the lifeguard flag on the day.";
+  } else {
+    result_el.className = "result unsafe";
+    verdict_el.className = "verdict unsafe-text";
+    verdict_el.textContent = "NOT SAFE";
+    bar_el.style.background = "#e8917c";
+    note_el.textContent = "Rough seas, strong wind, or recent incidents make this a risky week to swim.";
+  }
+}
+
+const temp_el = document.getElementById("temp");
+const wave_el = document.getElementById("wave");
+const wind_el = document.getElementById("wind");
+const current_el = document.getElementById("current");
+const uv_el = document.getElementById("uv");
+const incidents_el = document.getElementById("incidents");
+const weather_el = document.getElementById("weather");
+const crowd_el = document.getElementById("crowd");
+
+const v_temp = document.getElementById("v_temp");
+const v_wave = document.getElementById("v_wave");
+const v_wind = document.getElementById("v_wind");
+const v_current = document.getElementById("v_current");
+const v_uv = document.getElementById("v_uv");
+const v_inc = document.getElementById("v_inc");
+
+const result_el = document.getElementById("result");
+const verdict_el = document.getElementById("verdict");
+const pct_el = document.getElementById("pct");
+const bar_el = document.getElementById("bar");
+const note_el = document.getElementById("note");
+
+function updateLabels(){
+  v_temp.textContent = parseFloat(temp_el.value).toFixed(1) + "°C";
+  v_wave.textContent = parseFloat(wave_el.value).toFixed(1) + " m";
+  v_wind.textContent = Math.round(wind_el.value) + " km/h";
+  v_current.textContent = parseFloat(current_el.value).toFixed(1) + " / 10";
+  v_uv.textContent = parseFloat(uv_el.value).toFixed(1);
+  v_inc.textContent = Math.round(incidents_el.value);
+}
+
+[temp_el, wave_el, wind_el, current_el, uv_el, incidents_el, weather_el, crowd_el].forEach(el => {
+  el.addEventListener("input", () => { updateLabels(); predict(); });
+});
+
+updateLabels();
+predict();
+</script>
+</body>
+</html>
