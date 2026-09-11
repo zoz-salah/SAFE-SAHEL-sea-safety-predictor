@@ -5,6 +5,42 @@ A beginner-friendly, end-to-end machine learning project that predicts whether
 it's safe to swim on Egypt's North Coast during **July, August, and September**.
 
 ---
+## 📸 Demo Preview:
+<img width="1873" height="792" alt="image" src="https://github.com/user-attachments/assets/0361940e-23cf-4e1b-94b8-3c4a4f906107" />
+watch *LIVE DEMO* here : https://drive.google.com/file/d/188auJFMY70hT2UZ4XWLI7YeQffnHkNNQ/view?usp=sharing
+
+
+### Interactive Swimming Safety Predictor
+
+The project includes a browser-based interactive application that allows users to enter sea and weather conditions and receive a predicted swimming safety percentage.
+
+---
+### Demo Screenshots
+
+
+<img width="1540" height="646" alt="Screenshot 2026-09-11 142642" src="https://github.com/user-attachments/assets/0d061bf9-230c-45b5-95db-eca245e7f6a8" />
+
+<img width="1446" height="803" alt="image" src="https://github.com/user-attachments/assets/ed8d1725-f862-41a2-a94f-fcd045bb0ebb" />
+
+<img width="1453" height="326" alt="image" src="https://github.com/user-attachments/assets/733d62aa-b2f4-4f4b-b01c-3be9b52dcef9" />
+
+
+---
+
+## 🎯 Project Objective
+
+The goal of Safe Sahel is to demonstrate how machine learning can be applied to environmental and safety-related prediction problems.
+
+The project focuses on:
+
+- Data generation and preparation
+- Exploratory Data Analysis (EDA)
+- Feature engineering
+- Supervised machine learning
+- Model evaluation
+- Interactive prediction
+
+---
 
 ## What's inside
 
