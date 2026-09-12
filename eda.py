@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.read_csv("/home/claude/safe_sahel/data/swim_safety_data.csv")
+df = pd.read_csv("/home/safe_sahel/data/swim_safety_data.csv")
 
 print("=== Basic Info ===")
 print(df.info())
