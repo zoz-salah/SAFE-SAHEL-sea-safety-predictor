@@ -1,11 +1,3 @@
-"""
-Safe Sahel - Step 7: Front-End Interface (simple command-line app)
-====================================================================
-Run this file with: python3 predict_app.py
-It asks you simple questions about this week's sea conditions and tells
-you whether it is SAFE or NOT SAFE to swim, plus a safety percentage.
-"""
-
 import joblib
 import pandas as pd
 
@@ -13,7 +5,6 @@ MODEL_PATH = "model/safe_sahel_model.pkl"
 
 
 def ask_float(prompt, min_val, max_val):
-    """Keep asking until the user gives a valid number in range."""
     while True:
         try:
             value = float(input(prompt))
@@ -60,7 +51,6 @@ def main():
     historical_incidents = ask_int("Reported incidents this week (0, 1, 2...): ", 0, 20)
     crowd_level = ask_choice("Beach crowd level", ["Low", "Medium", "High"])
 
-    # Feature engineering must match train_model.py exactly
     sea_roughness_score = wave_height * 2 + wind_speed / 10 + current_strength
     recent_incident_flag = 1 if historical_incidents > 0 else 0
 
@@ -78,7 +68,7 @@ def main():
     }])
 
     model = joblib.load(MODEL_PATH)
-    probability_safe = model.predict_proba(input_row)[0][1]  # class 1 = Safe
+    probability_safe = model.predict_proba(input_row)[0][1]
     prediction = "SAFE" if probability_safe >= 0.5 else "NOT SAFE"
 
     print("\n" + "=" * 55)
